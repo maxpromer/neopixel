@@ -3,11 +3,41 @@
 
 #include "ws2812.h"
 
-static uint32_t _getCycleCount(void) __attribute__((always_inline));
-static inline uint32_t _getCycleCount(void) {
-  uint32_t ccount;
-  __asm__ __volatile__("rsr %0,ccount":"=a" (ccount));
-  return ccount;
+static void IRAM_ATTR u8_to_rmt(const void* src, rmt_item32_t* dest, size_t src_size, size_t wanted_num, size_t* translated_size, size_t* item_num) {
+	if(src == NULL || dest == NULL) {
+		*translated_size = 0;
+		*item_num = 0;
+		return;
+	}
+    
+	/*
+	const rmt_item32_t bit0 = {{{ 28, 1, 72, 0 }}};  //Logical 0
+	const rmt_item32_t bit1 = {{{ 56, 1, 44, 0 }}};  //Logical 1
+	*/
+	const rmt_item32_t bit0 = {{{ 28, 0, 72, 1 }}};  //Logical 0
+	const rmt_item32_t bit1 = {{{ 56, 0, 44, 1 }}};  //Logical 1
+	
+	size_t size = 0;
+	size_t num = 0;
+	uint8_t *psrc = (uint8_t *)src;
+	rmt_item32_t* pdest = dest;
+	while (size < src_size && num < wanted_num) {
+		for(int i = 0; i < 8; i++) {
+			if(*psrc & (0x1 << i)) {
+				pdest->val =  bit1.val;
+				// pdest->val =  bit0.val; 
+			} else {
+				pdest->val =  bit0.val;
+				// pdest->val =  bit1.val;
+			}
+			num++;
+			pdest++;
+		}
+		size++;
+		psrc++;
+	}
+	*translated_size = size;
+	*item_num = num;
 }
 
 WS2812::WS2812() { }
@@ -52,47 +82,6 @@ bool WS2812::prop_write(int index, char *value) {
 
 void WS2812::process(Driver *drv) { }
 
-// Code from Adafruit : https://github.com/adafruit/Adafruit_NeoPixel Thank you so much !
-#define F_CPU 240000000L
-#define CYCLES_800_T0H  (F_CPU / 2500000) // 0.4us
-#define CYCLES_800_T1H  (F_CPU / 1250000) // 0.8us
-#define CYCLES_800      (F_CPU /  800000) // 1.25us per bit
-
-void WS2812::espShow(uint8_t pin, uint8_t *pixels, uint32_t numBytes) {
-	uint8_t *p, *end, pix, mask;
-	uint32_t t, time0, time1, period, c, startTime;
-
-	p         =  pixels;
-	end       =  p + numBytes;
-	pix       = *p++;
-	mask      = 0x80;
-	startTime = 0;
-	
-	time0  = CYCLES_800_T0H;
-	time1  = CYCLES_800_T1H;
-	period = CYCLES_800;
-
-	for(t = time0;; t = time0) {
-		if(pix & mask) t = time1;                             // Bit high duration
-		while(((c = _getCycleCount()) - startTime) < period); // Wait for bit start
-
-		// gpio_set_level(pin, 1);
-		gpio_set_level((gpio_num_t)pin, 0);
-
-		startTime = c;                                        // Save start time
-		while(((c = _getCycleCount()) - startTime) < t);      // Wait high duration
-
-		// gpio_set_level(pin, 0);
-		gpio_set_level((gpio_num_t)pin, 1);
-
-		if(!(mask >>= 1)) {                                   // Next bit/byte
-			if(p >= end) break;
-			pix  = *p++;
-			mask = 0x80;
-		}
-	}
-	while((_getCycleCount() - startTime) < period); // Wait for last bit
-}
 
 void WS2812::init(int pin, int length) {
 	this->pin = pin;
@@ -111,21 +100,20 @@ void WS2812::init(int pin, int length) {
 	// Set up RMT
 	rmt_config_t config;
     config.rmt_mode = RMT_MODE_TX;
-    config.channel = RMT_TX_CHANNEL;
-    config.gpio_num = RMT_TX_GPIO;
-    config.mem_block_num = 3;
+    config.channel = RMT_CHANNEL_7;
+    config.gpio_num = (gpio_num_t)pin;
+    config.mem_block_num = 1;
     config.tx_config.loop_en = 0;
 	
-	
     config.tx_config.idle_output_en = 1;
-    config.tx_config.idle_level = 1;
+    config.tx_config.idle_level = RMT_IDLE_LEVEL_HIGH;
 	
 	config.tx_config.carrier_en = 0;
     config.tx_config.carrier_duty_percent = 0;
     config.tx_config.carrier_freq_hz = 0;
-    config.tx_config.carrier_level = 0;
+    config.tx_config.carrier_level = RMT_CARRIER_LEVEL_LOW;
 	
-	// ABP use 80MHz and NeoPixel use 800kHz so 80MHz / 100 = 800kHz
+	// ABP use 80MHz per 1 clock and 2 clock ABP for 1 clock RMT so clk_div = 1 is 40MHz
     config.clk_div = 1;
 
     ESP_ERROR_CHECK(rmt_config(&config));
@@ -134,7 +122,6 @@ void WS2812::init(int pin, int length) {
 	ESP_ERROR_CHECK(rmt_set_source_clk(config.channel, RMT_BASECLK_APB)); // 80MHz
 	
 	this->clear();
-	
 }
 
 void WS2812::setPixel(int n, uint32_t color) {
@@ -151,7 +138,9 @@ void WS2812::setPixel(int n, uint8_t r, uint8_t g, uint8_t b) {
 }
 
 void WS2812::show() {
+	ESP_ERROR_CHECK(rmt_write_sample(RMT_CHANNEL_7, colorBlock, length * 3, true));
 	
+	rmt_wait_tx_done(RMT_CHANNEL_7, portMAX_DELAY);
 }
 
 void WS2812::clear() {

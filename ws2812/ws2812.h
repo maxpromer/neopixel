@@ -1,27 +1,22 @@
 #ifndef __WS2812_H__
 #define __WS2812_H__
 
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
 #include "esp_system.h"
 #include "driver/gpio.h"
 #include "esp_intr_alloc.h"
 #include "esp_log.h"
+#include "driver/rmt.h"
 #include "kidbright32.h"
 #include "driver.h"
 #include "device.h"
 
-typedef struct {
-	uint8_t g;
-	uint8_t r;
-	uint8_t b;
-} Color888;
-
 class WS2812 : public Device {
 	private:
 		uint8_t *colorBlock = NULL;
-		
 		int pin, length;
-		
-		void espShow(uint8_t pin, uint8_t *pixels, uint32_t numBytes) ;
 
 	public:
 		// constructor
