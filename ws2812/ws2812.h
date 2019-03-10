@@ -17,7 +17,7 @@ typedef struct {
 
 class WS2812 : public Device {
 	private:
-		Color888 **colorBlock;
+		uint8_t *colorBlock = NULL;
 		
 		int pin, length;
 		
