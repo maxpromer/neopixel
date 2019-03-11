@@ -15,7 +15,7 @@ WS2812::WS2812(int pin) {
 	this->config.tx_config.loop_en = 0;
 	
 	this->config.tx_config.idle_output_en = 1;
-	this->config.tx_config.idle_level = RMT_IDLE_LEVEL_HIGH;
+	// this->config.tx_config.idle_level = RMT_IDLE_LEVEL_HIGH;
 	
 	this->config.tx_config.carrier_en = 0;
 	this->config.tx_config.carrier_duty_percent = 0;
