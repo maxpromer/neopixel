@@ -110,8 +110,8 @@ void WS2812::setPixel(int n, uint8_t r, uint8_t g, uint8_t b) {
 }
 
 void WS2812::show() {
-	uint32_t items_size = length * 24;
-	rmt_item32_t items[this->length * 24];
+	uint32_t items_size = this->length * 24;
+	rmt_item32_t items[items_size];
 	rmt_item32_t bit0;
 	rmt_item32_t bit1;
 	if ((pin == 26) || (pin == 27)) {
