@@ -13,10 +13,13 @@
 #include "driver.h"
 #include "device.h"
 
+static int KB_RMT_CH_NEXT = RMT_CHANNEL_0;
+
 class WS2812 : public Device {
 	private:
 		uint8_t *colorBlock = NULL;
 		int pin, length;
+		rmt_config_t config;
 
 	public:
 		// constructor
