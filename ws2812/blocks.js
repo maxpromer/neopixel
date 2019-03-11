@@ -32,8 +32,18 @@ Blockly.Blocks["neopixel_set_pixel"] = {
 	init: function() {
 		this.jsonInit({
 			"type": "",
-			"message0": "NeoPixel set pixel  %1 color %2",
+			"message0": "NeoPixel pin %1 set pixel %2 color %3",
 			"args0": [{
+				"type": "field_dropdown",
+				"name": "pin",
+				"options": [
+					[ "OUT1", "26" ],
+					[ "OUT2", "27" ],
+					[ "18", "18" ],
+					[ "19", "19" ], 
+					[ "23", "23" ]
+				]
+			}, {
 				"type": "input_value",
 				"name": "n"
 			}, {
@@ -54,8 +64,18 @@ Blockly.Blocks["neopixel_set_pixel"] = {
 Blockly.Blocks["neopixel_show"] = {
 	init: function() {
 		this.jsonInit({
-			"type": "",
-			"message0": "NeoPixel show",
+			"message0": "NeoPixel pin %1 show",
+			"args0": [{
+				"type": "field_dropdown",
+				"name": "pin",
+				"options": [
+					[ "OUT1", "26" ],
+					[ "OUT2", "27" ],
+					[ "18", "18" ],
+					[ "19", "19" ], 
+					[ "23", "23" ]
+				]
+			}],
 			"inputsInline": true,
 			"previousStatement": null,
 			"nextStatement": null,
@@ -69,7 +89,18 @@ Blockly.Blocks["neopixel_show"] = {
 Blockly.Blocks["neopixel_clear"] = {
 	init: function() {
 		this.jsonInit({
-			"message0": "NeoPixel clear",
+			"message0": "NeoPixel pin %1 clear",
+			"args0": [{
+				"type": "field_dropdown",
+				"name": "pin",
+				"options": [
+					[ "OUT1", "26" ],
+					[ "OUT2", "27" ],
+					[ "18", "18" ],
+					[ "19", "19" ], 
+					[ "23", "23" ]
+				]
+			}],
 			"inputsInline": true,
 			"previousStatement": null,
 			"nextStatement": null,

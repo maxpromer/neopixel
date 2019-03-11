@@ -3,7 +3,9 @@
 
 #include "ws2812.h"
 
-WS2812::WS2812() {
+WS2812::WS2812(int pin) {
+	this->pin = pin;
+	
 	// Set up RMT
 	this->config.rmt_mode = RMT_MODE_TX;
 	this->config.channel = (rmt_channel_t)KB_RMT_CH_NEXT;
@@ -64,8 +66,7 @@ bool WS2812::prop_write(int index, char *value) {
 
 void WS2812::process(Driver *drv) { }
 
-void WS2812::init(int pin, int length) {
-	this->pin = pin;
+void WS2812::init(int length) {
 	this->length = length;
 	
 	// GPIO config

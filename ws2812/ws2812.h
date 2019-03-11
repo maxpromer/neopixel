@@ -23,7 +23,7 @@ class WS2812 : public Device {
 
 	public:
 		// constructor
-		WS2812();
+		WS2812(int pin) ;
 		
 		// override
 		void init(void);
@@ -36,7 +36,7 @@ class WS2812 : public Device {
 		bool prop_write(int index, char *value);
 		
 		// method
-		void init(int pin, int length) ;
+		void init(int length) ;
 		void setPixel(int n, uint32_t color) ;
 		void setPixel(int n, uint8_t r, uint8_t g, uint8_t b) ;
 		void show() ;
