@@ -71,7 +71,7 @@ void WS2812::init(int length) {
 	
 	// GPIO config
 	gpio_pad_select_gpio((gpio_num_t)pin);
-    gpio_set_direction((gpio_num_t)pin, GPIO_MODE_OUTPUT);
+	gpio_set_direction((gpio_num_t)pin, GPIO_MODE_OUTPUT);
 	
 	// Create color buffer
 	if (this->colorBlock) {
