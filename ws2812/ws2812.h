@@ -20,6 +20,7 @@ class WS2812 : public Device {
 		uint8_t *colorBlock = NULL;
 		int pin, length;
 		rmt_config_t config;
+		uint8_t brightness;
 
 	public:
 		// constructor
@@ -37,6 +38,7 @@ class WS2812 : public Device {
 		
 		// method
 		void init(int length) ;
+		void setBrightness(double brightness) ;
 		void setPixel(int n, uint32_t color) ;
 		void setPixel(int n, uint8_t r, uint8_t g, uint8_t b) ;
 		void show() ;

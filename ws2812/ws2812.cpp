@@ -23,6 +23,8 @@ WS2812::WS2812(int pin) {
 	this->config.tx_config.carrier_level = RMT_CARRIER_LEVEL_LOW;
 	
 	this->config.clk_div = 1; // APB use 80MHz per 1 clock and 2 clock APB for 1 clock RMT so clk_div = 1 is 40MHz
+	
+	this->brightness = 50; // Set brightness to 50%
 }
 
 void WS2812::init(void) { 
@@ -96,8 +98,34 @@ void WS2812::init(int length) {
 	this->clear();
 }
 
+void WS2812::setBrightness(double brightness) {
+	fmin(brightness, 100);
+	fmax(brightness, 0);
+	
+	this->brightness = brightness;
+}
+
 void WS2812::setPixel(int n, uint32_t color) {
-	this->setPixel(n, (color>>16)&0xFF, (color>>8)&0xFF, color&0xFF);
+	uint8_t r = (color>>16)&0xFF;
+	uint8_t g = (color>>8)&0xFF;
+	uint8_t b = color&0xFF;
+	
+	/*
+	ESP_LOGI("COLOR", "Before rgb(%d, %d, %d)", r, g, b);
+	
+	r = (float)r * (float)this->brightness / 100.0;
+	g = (float)g * (float)this->brightness / 100.0;
+	b = (float)b * (float)this->brightness / 100.0;
+	
+	
+	r = (r * this->brightness) >> 8;
+    g = (g * this->brightness) >> 8;
+    b = (b * this->brightness) >> 8;
+	
+	ESP_LOGI("COLOR", "After rgb(%d, %d, %d)", r, g, b);
+	*/
+	
+	this->setPixel(n, r, g, b);
 }
 
 void WS2812::setPixel(int n, uint8_t r, uint8_t g, uint8_t b) {
