@@ -142,14 +142,14 @@ void WS2812::show() {
 	 * WS2812 want 1.25uS so 12.5nS * 100 = 1.25uS
 	 * Use 100 tick to get 1.25uS
 	 *
-	 * ======== Timeing from Datasheets ========
+	 * ======== Timing from Datasheets ========
 	 * The T0H want 0.35uS so 350nS / 12.5nS = 28 tick
 	 * The T0L want 0.8uS so 800nS / 12.5nS = 64 tick
 	 * 
 	 * The T1H want 0.7uS so 700nS / 12.5nS = 56 tick
 	 * The T1L want 0.6uS so 600nS / 12.5nS = 48 tick
 	 * 
-	 * ======== Timeing from ESP32 Core for Arduino ========
+	 * ======== Timing from ESP32 Core for Arduino ========
 	 * The T0H want 0.4uS so 400nS / 12.5nS = 32 tick
 	 * The T0L want 0.8uS so 800nS / 12.5nS = 64 tick
 	 * 
@@ -164,7 +164,7 @@ void WS2812::show() {
 	rmt_item32_t bit0;
 	rmt_item32_t bit1;
 	/*
-	// Timeing from Datasheets
+	// Timing from Datasheets
 	if ((pin == 26) || (pin == 27)) {
 		bit0 = {{{ 28, 0, 64, 1 }}};  //Logical 0
 		bit1 = {{{ 56, 0, 48, 1 }}};  //Logical 1
@@ -174,7 +174,7 @@ void WS2812::show() {
 	}
 	*/
 	
-	// Timeing from ESP32 Core for Arduino
+	// Timing from ESP32 Core for Arduino
 	if ((pin == 26) || (pin == 27)) {
 		bit0 = {{{ 32, 0, 64, 1 }}};  //Logical 0
 		bit1 = {{{ 64, 0, 32, 1 }}};  //Logical 1
